@@ -15,7 +15,7 @@ $pdf->SetFont($pdfFont, 'B', 28);
 $pdf->SetTextColor(255);
 $pdf->SetLineWidth(0.75);
 $pdf->StartTransform();
-$pdf->Rotate(-35, 100, 225);
+$pdf->Rotate(-35, 90, 200);
 if ($status == 'Draft') {
     $pdf->SetFillColor(200);
     $pdf->SetDrawColor(140);
@@ -35,7 +35,12 @@ if ($status == 'Draft') {
     $pdf->SetFillColor(223, 85, 74);
     $pdf->SetDrawColor(171, 49, 43);
 }
-$pdf->Cell(100, 18, strtoupper(Lang::trans('invoices' . strtolower($status))), 'TB', 0, 'C', '1');
+
+if ($status != 'Unpaid')
+{
+	$pdf->Cell(120, 18, strtoupper(Lang::trans('invoices' . strtolower($status))), 'TB', 0, 'C', '1');
+}
+
 $pdf->StopTransform();
 $pdf->SetTextColor(0);
 
@@ -59,10 +64,11 @@ $pdf->Ln(5);
 
 $pdf->SetFont($pdfFont, 'B', 15);
 $pdf->SetFillColor(239);
-$pdf->Cell(0, 8, $pagetitle, 0, 1, 'L', '1');
+$pdf->Cell(0, 8, Lang::trans('invoicenumber').": ".$invoicenum, 0, 1, 'L', '1');
 $pdf->SetFont($pdfFont, '', 10);
 $pdf->Cell(0, 6, Lang::trans('invoicesdatecreated') . ': ' . $datecreated, 0, 1, 'L', '1');
 $pdf->Cell(0, 6, Lang::trans('invoicesdatedue') . ': ' . $duedate, 0, 1, 'L', '1');
+$pdf->Cell(0,6,Lang::trans('invoicesteljesites').': '.$duedate.'',0,1,'L','1');
 $pdf->Ln(10);
 
 $startpage = $pdf->GetPage();
@@ -74,9 +80,9 @@ $pdf->Cell(0, 4, Lang::trans('invoicesinvoicedto'), 0, 1);
 $pdf->SetFont($pdfFont, '', 9);
 if ($clientsdetails["companyname"]) {
     $pdf->Cell(0, 4, $clientsdetails["companyname"], 0, 1, 'L');
-    $pdf->Cell(0, 4, Lang::trans('invoicesattn') . ': ' . $clientsdetails["firstname"] . ' ' . $clientsdetails["lastname"], 0, 1, 'L');
+    $pdf->Cell(0, 4, Lang::trans('invoicesattn') . ': ' . $clientsdetails["lastname"] . ' ' . $clientsdetails["firstname"], 0, 1, 'L');
 } else {
-    $pdf->Cell(0, 4, $clientsdetails["firstname"] . " " . $clientsdetails["lastname"], 0, 1, 'L');
+    $pdf->Cell(0, 4, $clientsdetails["lastname"] . " " . $clientsdetails["firstname"], 0, 1, 'L');
 }
 $pdf->Cell(0, 4, $clientsdetails["address1"], 0, 1, 'L');
 if ($clientsdetails["address2"]) {
@@ -95,24 +101,41 @@ $pdf->Ln(10);
 # Invoice Items
 $tblhtml = '<table width="100%" bgcolor="#ccc" cellspacing="1" cellpadding="2" border="0">
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;text-align:center;">
-        <td width="80%">' . Lang::trans('invoicesdescription') . '</td>
-        <td width="20%">' . Lang::trans('quotelinetotal') . '</td>
+	        <td width="8%">'.Lang::trans('invoicesegyseg').'</td>
+                <td width="24%">'.Lang::trans('invoicesteszor').'</td>
+                <td width="49%">'.Lang::trans('invoicesdescription').'</td>
+        <td width="19%">'.Lang::trans('invoicesamount').'</td>
+
     </tr>';
-foreach ($invoiceitems as $item) {
+
+foreach ($invoiceitems AS $item) {
+	if ($item['type'] == "DomainRegister") { $teszor = "620920 domain név regisztráció"; }
+	elseif ($item['type'] == "Domain") { $teszor = "620920 domain név szolgáltatás"; }
+	elseif ($item['type'] == "Hosting") { $teszor = "631112 webhosting szolgáltatás"; }
+	elseif ($item['description'] == "SzÃ¡mÃ­tÃ³gÃ©pes adatfeldolgozÃ¡s") { $teszor = "631104 Adatfeldolgozási szolgáltatás"; }
+	else { $teszor = "631112 webhosting szolgáltatás"; };
+	
+
     $tblhtml .= '
     <tr bgcolor="#fff">
-        <td align="left">' . nl2br($item['description']) . '<br /></td>
-        <td align="center">' . $item['amount'] . '</td>
+        <td align="center">1 db</td>
+		<td align="center">'.$teszor.'</td>
+		<td align="left">'.nl2br($item['description']).'<br /></td>
+        <td align="center">'.$item['amount'].'</td>
     </tr>';
 }
 $tblhtml .= '
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;">
-        <td align="right">' . Lang::trans('invoicessubtotal') . '</td>
+        		<td align="center"></td>
+		<td align="center"></td>
+<td align="right">' . Lang::trans('invoicessubtotal') . '</td>
         <td align="center">' . $subtotal . '</td>
     </tr>';
 if ($taxname) {
     $tblhtml .= '
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;">
+		<td align="center"></td>
+		<td align="center"></td>
         <td align="right">' . $taxrate . '% ' . $taxname . '</td>
         <td align="center">' . $tax . '</td>
     </tr>';
@@ -120,16 +143,22 @@ if ($taxname) {
 if ($taxname2) {
     $tblhtml .= '
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;">
+		<td align="center"></td>
+		<td align="center"></td>
         <td align="right">' . $taxrate2 . '% ' . $taxname2 . '</td>
         <td align="center">' . $tax2 . '</td>
     </tr>';
 }
 $tblhtml .= '
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;">
+		<td align="center"></td>
+		<td align="center"></td>
         <td align="right">' . Lang::trans('invoicescredit') . '</td>
         <td align="center">' . $credit . '</td>
     </tr>
     <tr height="30" bgcolor="#efefef" style="font-weight:bold;">
+		<td align="center"></td>
+		<td align="center"></td>
         <td align="right">' . Lang::trans('invoicestotal') . '</td>
         <td align="center">' . $total . '</td>
     </tr>
@@ -177,6 +206,9 @@ $tblhtml .= '
         <td align="center">' . $balance . '</td>
     </tr>
 </table>';
+
+# számla kötelezõ rész az alján
+$tblhtml .= '<br /><p align="center">'.$_LANG["invoicesinvoicedefinition"].'</p>';
 
 $pdf->writeHTML($tblhtml, true, false, false, false, '');
 

@@ -28,7 +28,7 @@
                     {else}
                         <h2>{$companyname}</h2>
                     {/if}
-                    <h3>{$pagetitle}</h3>
+                    <h3>{$LANG.invoicenumber}: {$invoicenum}</h3>
 
                 </div>
                 <div class="col-sm-5 text-center">
@@ -37,7 +37,7 @@
                         {if $status eq "Draft"}
                             <span class="draft">{$LANG.invoicesdraft}</span>
                         {elseif $status eq "Unpaid"}
-                            <span class="unpaid">{$LANG.invoicesunpaid}</span>
+<!--                            <span class="unpaid">{$LANG.invoicesunpaid}</span> -->
                         {elseif $status eq "Paid"}
                             <span class="paid">{$LANG.invoicespaid}</span>
                         {elseif $status eq "Refunded"}
@@ -50,9 +50,6 @@
                     </div>
 
                     {if $status eq "Unpaid" || $status eq "Draft"}
-                        <div class="small-text">
-                            {$LANG.invoicesdatedue}: {$datedue}
-                        </div>
                         <div class="payment-btn-container" align="center">
                             {$paymentbutton}
                         </div>
@@ -84,7 +81,7 @@
                     <strong>{$LANG.invoicesinvoicedto}:</strong>
                     <address class="small-text">
                         {if $clientsdetails.companyname}{$clientsdetails.companyname}<br />{/if}
-                        {$clientsdetails.firstname} {$clientsdetails.lastname}<br />
+                        {$clientsdetails.lastname} {$clientsdetails.firstname}<br />
                         {$clientsdetails.address1}, {$clientsdetails.address2}<br />
                         {$clientsdetails.city}, {$clientsdetails.state}, {$clientsdetails.postcode}<br />
                         {$clientsdetails.country}
@@ -113,9 +110,17 @@
                     <br /><br />
                 </div>
                 <div class="col-sm-6 text-right-sm">
-                    <strong>{$LANG.invoicesdatecreated}:</strong><br>
+                    <strong>{$LANG.invoicesdatecreated}:</strong>
                     <span class="small-text">
-                        {$date}<br><br>
+                        {$date}<br>
+                    </span>
+					<strong>{$LANG.invoicesdatedue}:</strong>
+                    <span class="small-text">
+                        {$datedue}<br>
+                    </span>
+					<strong>{$LANG.invoicesteljesites}:</strong>
+                    <span class="small-text">
+                        {$datedue}<br>
                     </span>
                 </div>
             </div>
@@ -159,6 +164,8 @@
                         <table class="table table-condensed">
                             <thead>
                                 <tr>
+									<td><strong>{$LANG.invoicesegyseg}</strong></td>
+									<td><strong>{$LANG.invoicesteszor}</strong></td>
                                     <td><strong>{$LANG.invoicesdescription}</strong></td>
                                     <td width="20%" class="text-center"><strong>{$LANG.invoicesamount}</strong></td>
                                 </tr>
@@ -166,32 +173,43 @@
                             <tbody>
                                 {foreach from=$invoiceitems item=item}
                                     <tr>
+										<td>1 db</td>
+										<td>{if $item.type eq "DomainRegister"}620920 domain név regisztráció
+										{elseif $item.type eq "Domain"}620920 domain név regisztráció
+										{elseif $item.type eq "Hosting"}631112 webhosting szolgáltatás
+										{elseif $item.description eq "Számítógépes adatfeldolgozás"}631104 Adatfeldolgozási szolgáltatás
+										{else}631112 webhosting szolgáltatás
+										
+										{/if}
+										</td>
                                         <td>{$item.description}{if $item.taxed eq "true"} *{/if}</td>
                                         <td class="text-center">{$item.amount}</td>
                                     </tr>
                                 {/foreach}
                                 <tr>
-                                    <td class="total-row text-right"><strong>{$LANG.invoicessubtotal}</strong></td>
+                                    <td colspan=3 class="total-row text-right"><strong>{$LANG.invoicessubtotal}</strong></td>
                                     <td class="total-row text-center">{$subtotal}</td>
                                 </tr>
                                 {if $taxrate}
                                     <tr>
-                                        <td class="total-row text-right"><strong>{$taxrate}% {$taxname}</strong></td>
+                                        <td colspan=3 class="total-row text-right"><strong>{$taxrate}% {$taxname}</strong></td>
                                         <td class="total-row text-center">{$tax}</td>
                                     </tr>
                                 {/if}
                                 {if $taxrate2}
                                     <tr>
-                                        <td class="total-row text-right"><strong>{$taxrate2}% {$taxname2}</strong></td>
+                                        <td colspan=3 class="total-row text-right"><strong>{$taxrate2}% {$taxname2}</strong></td>
                                         <td class="total-row text-center">{$tax2}</td>
                                     </tr>
                                 {/if}
+								{if $credit ne "0,00 Ft"}
                                 <tr>
-                                    <td class="total-row text-right"><strong>{$LANG.invoicescredit}</strong></td>
+                                    <td colspan=3 class="total-row text-right"><strong>{$LANG.invoicescredit}</strong></td>
                                     <td class="total-row text-center">{$credit}</td>
                                 </tr>
+								{/if}
                                 <tr>
-                                    <td class="total-row text-right"><strong>{$LANG.invoicestotal}</strong></td>
+                                    <td colspan=3 class="total-row text-right"><strong>{$LANG.invoicestotal}</strong></td>
                                     <td class="total-row text-center">{$total}</td>
                                 </tr>
                             </tbody>
@@ -236,7 +254,12 @@
                     </table>
                 </div>
             </div>
-
+			
+<div align=center>
+{*if $status eq "Paid"*}
+{$LANG.invoicesinvoicedefinition}{*else}
+{$LANG.invoicesproformadefinition}{/if*}
+</div>
             <div class="pull-right btn-group btn-group-sm hidden-print">
                 <a href="javascript:window.print()" class="btn btn-default"><i class="fa fa-print"></i> {$LANG.print}</a>
                 <a href="dl.php?type=i&amp;id={$invoiceid}" class="btn btn-default"><i class="fa fa-download"></i> {$LANG.invoicesdownload}</a>
