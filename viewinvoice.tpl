@@ -30,7 +30,10 @@
                     {else}
                         <h2>{$companyname}</h2>
                     {/if}
-                    <h3>{$LANG.invoicenumber}: {$invoicenum}</h3>
+                    <h3>
+                    <!-- régi számlafelirat {$LANG.invoicenumber}: {$invoicenum} -->
+                    {$pagetitle}
+                    </h3>
 
                 </div>
                 <div class="invoice-col text-center">
