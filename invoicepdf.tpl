@@ -67,8 +67,13 @@ $pdf->Ln(5);
 
 $pdf->SetFont($pdfFont, 'B', 15);
 $pdf->SetFillColor(239);
-# $pdf->Cell(0, 8, Lang::trans('invoicenumber').": ".$invoicenum, 0, 1, 'L', '1');
-$pdf->Cell(0, 8, $pagetitle, 0, 1, 'L', '1');
+
+# saját számlasorszám
+$pdf->Cell(0, 8, Lang::trans('invoicenumber').": ".$invoicenum, 0, 1, 'L', '1');
+
+# gyári számlaszorszám
+#$pdf->Cell(0, 8, $pagetitle, 0, 1, 'L', '1');
+
 $pdf->SetFont($pdfFont, '', 10);
 $pdf->Cell(0, 6, Lang::trans('invoicesdatecreated') . ': ' . $datecreated, 0, 1, 'L', '1');
 $pdf->Cell(0, 6, Lang::trans('invoicesdatedue') . ': ' . $duedate, 0, 1, 'L', '1');

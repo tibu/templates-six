@@ -31,8 +31,9 @@
                         <h2>{$companyname}</h2>
                     {/if}
                     <h3>
+			{$LANG.invoicenumber}: {$invoicenum}
                     <!-- régi számlafelirat {$LANG.invoicenumber}: {$invoicenum} -->
-                    {$pagetitle}
+                    <!-- gyári számla felirat {$pagetitle} -->
                     </h3>
 
                 </div>
